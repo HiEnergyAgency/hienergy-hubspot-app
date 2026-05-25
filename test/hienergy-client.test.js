@@ -2,6 +2,7 @@ const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
 const {
   summarizeForCard,
+  summarizeToolListResponse,
   domainFromEmail,
   domainFromWebsite,
   rowLabel,
@@ -66,5 +67,38 @@ describe('hienergy-client helpers', () => {
       }),
       /active/
     );
+  });
+
+  it('summarizes advertiser and contact list responses for cards', () => {
+    const advertisers = summarizeToolListResponse(
+      'advertisers',
+      {
+        data: [{ id: 'a1', attributes: { display_name: 'Nike', slug: 'nike' } }]
+      },
+      5,
+      'nike'
+    );
+    assert.equal(advertisers.sections[0].type, 'advertisers');
+    assert.equal(advertisers.sections[0].rows[0].label, 'Nike');
+
+    const contacts = summarizeToolListResponse(
+      'contacts',
+      {
+        data: [
+          {
+            id: 'c1',
+            attributes: {
+              given_name: 'Alex',
+              family_name: 'Smith',
+              email: 'alex@nike.com'
+            }
+          }
+        ]
+      },
+      5,
+      'alex@nike.com'
+    );
+    assert.equal(contacts.sections[0].type, 'contacts');
+    assert.equal(contacts.sections[0].rows[0].label, 'Alex Smith');
   });
 });

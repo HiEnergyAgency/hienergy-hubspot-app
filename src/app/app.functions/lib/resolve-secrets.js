@@ -1,10 +1,12 @@
 const DEFAULT_MCP_URL = 'https://app.hienergy.ai/mcp';
+const DEFAULT_API_BASE = 'https://app.hienergy.ai/api/v1';
 
 async function resolveHiEnergySecrets(context = {}) {
   const baseSecrets = context.secrets || {};
   if (baseSecrets.HIENERGY_API_KEY) {
     return {
       HIENERGY_API_KEY: baseSecrets.HIENERGY_API_KEY,
+      HIENERGY_API_BASE: baseSecrets.HIENERGY_API_BASE || DEFAULT_API_BASE,
       HIENERGY_MCP_URL: baseSecrets.HIENERGY_MCP_URL || DEFAULT_MCP_URL
     };
   }
@@ -33,6 +35,8 @@ async function resolveHiEnergySecrets(context = {}) {
       if (apiKey) {
         return {
           HIENERGY_API_KEY: apiKey,
+          HIENERGY_API_BASE:
+            payload.api_base || payload.apiBase || baseSecrets.HIENERGY_API_BASE || DEFAULT_API_BASE,
           HIENERGY_MCP_URL: payload.mcp_url || payload.mcpUrl || DEFAULT_MCP_URL
         };
       }
@@ -46,6 +50,7 @@ async function resolveHiEnergySecrets(context = {}) {
     if (apiKey) {
       return {
         HIENERGY_API_KEY: apiKey,
+        HIENERGY_API_BASE: baseSecrets.HIENERGY_API_BASE || DEFAULT_API_BASE,
         HIENERGY_MCP_URL: baseSecrets.HIENERGY_MCP_URL || DEFAULT_MCP_URL
       };
     }

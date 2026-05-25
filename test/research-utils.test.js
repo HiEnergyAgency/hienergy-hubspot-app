@@ -31,8 +31,17 @@ describe('research utils', () => {
   it('builds contact search query from email or company', () => {
     assert.deepEqual(utils.getContactSearchQuery({ email: 'alex@nike.com' }), {
       domain: 'nike.com',
-      query: 'nike.com',
+      query: 'alex@nike.com',
       email: 'alex@nike.com'
+    });
+
+    assert.deepEqual(utils.getContactSearchQueries({ email: 'alex@nike.com' }), {
+      email: 'alex@nike.com',
+      domain: 'nike.com',
+      name: '',
+      company: '',
+      contactQuery: 'alex@nike.com',
+      advertiserQuery: 'nike.com'
     });
 
     assert.deepEqual(
@@ -88,5 +97,39 @@ describe('research utils', () => {
       utils.formatSectionTitle({ type: 'advertiser_contacts', total: 3 }),
       'Advertiser contacts · 3'
     );
+  });
+
+  it('merges advertiser and contact sections without duplicates', () => {
+    const merged = utils.mergeResearchBodies([
+      {
+        ok: true,
+        sections: [
+          {
+            type: 'advertisers',
+            total: 1,
+            rows: [{ id: 'a1', label: 'Nike' }]
+          }
+        ]
+      },
+      {
+        ok: true,
+        advertisers: [{ id: 'a1', label: 'Nike' }]
+      },
+      {
+        ok: true,
+        sections: [
+          {
+            type: 'contacts',
+            total: 1,
+            rows: [{ id: 'c1', label: 'Alex Smith' }]
+          }
+        ]
+      }
+    ]);
+
+    assert.equal(merged.ok, true);
+    assert.equal(merged.sections.length, 2);
+    assert.equal(merged.sections[0].rows.length, 1);
+    assert.equal(merged.sections[1].rows.length, 1);
   });
 });

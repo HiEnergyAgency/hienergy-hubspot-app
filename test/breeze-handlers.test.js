@@ -21,6 +21,8 @@ describe('breeze handlers', () => {
   it('registers card, settings, and breeze tool routes', () => {
     assert.ok(ROUTES['/hubspot/cards/universal-search']);
     assert.ok(ROUTES['/hubspot/cards/advertiser-by-domain']);
+    assert.ok(ROUTES['/hubspot/cards/search-advertisers']);
+    assert.ok(ROUTES['/hubspot/cards/search-contacts']);
     assert.ok(ROUTES['/hubspot/settings/validate']);
     assert.ok(ROUTES['/hubspot/breeze/tools/universal-search']);
   });
@@ -69,10 +71,27 @@ describe('breeze handlers', () => {
       .digest('hex');
 
     const originalFetch = global.fetch;
-    global.fetch = async () => ({
-      ok: true,
-      json: async () => ({ result: { protocolVersion: '2025-11-25' } })
-    });
+    global.fetch = async (url) => {
+      if (String(url).includes('/tools')) {
+        return {
+          ok: true,
+          status: 200,
+          text: async () =>
+            JSON.stringify({
+              tools: [],
+              api_version: 'v1',
+              base_url: 'https://app.hienergy.ai'
+            })
+        };
+      }
+
+      return {
+        ok: true,
+        status: 200,
+        text: async () =>
+          JSON.stringify({ result: { protocolVersion: '2025-11-25' } })
+      };
+    };
 
     try {
       const response = await dispatchHubSpotRequest({

@@ -1,4 +1,5 @@
 const DEFAULT_MCP_URL = 'https://app.hienergy.ai/mcp';
+const DEFAULT_API_BASE = 'https://app.hienergy.ai/api/v1';
 
 async function resolveSecretsForPortal(portalId) {
   const id = portalId == null ? '' : String(portalId);
@@ -20,6 +21,11 @@ async function resolveSecretsForPortal(portalId) {
       if (apiKey) {
         return {
           HIENERGY_API_KEY: apiKey,
+          HIENERGY_API_BASE:
+            payload.api_base ||
+            payload.apiBase ||
+            process.env.HIENERGY_API_BASE ||
+            'https://app.hienergy.ai/api/v1',
           HIENERGY_MCP_URL: payload.mcp_url || payload.mcpUrl || process.env.HIENERGY_MCP_URL || DEFAULT_MCP_URL
         };
       }
@@ -33,6 +39,7 @@ async function resolveSecretsForPortal(portalId) {
     if (apiKey) {
       return {
         HIENERGY_API_KEY: apiKey,
+        HIENERGY_API_BASE: process.env.HIENERGY_API_BASE || DEFAULT_API_BASE,
         HIENERGY_MCP_URL: process.env.HIENERGY_MCP_URL || DEFAULT_MCP_URL
       };
     }
@@ -41,6 +48,7 @@ async function resolveSecretsForPortal(portalId) {
   if (process.env.HIENERGY_API_KEY) {
     return {
       HIENERGY_API_KEY: process.env.HIENERGY_API_KEY,
+      HIENERGY_API_BASE: process.env.HIENERGY_API_BASE || DEFAULT_API_BASE,
       HIENERGY_MCP_URL: process.env.HIENERGY_MCP_URL || DEFAULT_MCP_URL
     };
   }

@@ -2,7 +2,8 @@ import { hubspot } from '@hubspot/ui-extensions';
 import {
   APP_ORIGIN,
   getCompanySearchContext,
-  getContactSearchQuery,
+  getContactSearchQueries,
+  mergeResearchBodies,
   normalizeCompanyResearchBody
 } from './researchUtils';
 
@@ -11,12 +12,15 @@ export {
   domainFromEmail,
   domainFromWebsite,
   getCompanySearchContext,
+  getContactSearchQueries,
   getContactSearchQuery,
+  mergeResearchBodies,
   normalizeCompanyResearchBody,
   researchSummary
 } from './researchUtils';
 
 const CARDS_BASE = `${APP_ORIGIN}/hubspot/cards`;
+const DEFAULT_LIMIT = 5;
 
 async function postCard(path, body, portalId) {
   const response = await hubspot.fetch(`${CARDS_BASE}${path}`, {
@@ -37,6 +41,21 @@ async function postCard(path, body, portalId) {
   return response.json();
 }
 
+async function searchAdvertisers(query, portalId, limit = DEFAULT_LIMIT) {
+  if (!query) return null;
+  return postCard('/search-advertisers', { query, limit }, portalId);
+}
+
+async function searchContacts(query, portalId, limit = DEFAULT_LIMIT) {
+  if (!query) return null;
+  return postCard('/search-contacts', { query, limit }, portalId);
+}
+
+async function searchAdvertisersByDomain(domain, portalId) {
+  if (!domain) return null;
+  return postCard('/advertiser-by-domain', { domain }, portalId);
+}
+
 export async function researchCompany(properties = {}, portalId) {
   const { domain, query } = getCompanySearchContext(properties);
 
@@ -47,40 +66,91 @@ export async function researchCompany(properties = {}, portalId) {
     };
   }
 
-  const body = domain
-    ? await postCard('/advertiser-by-domain', { domain }, portalId)
-    : await postCard(
-        '/universal-search',
-        {
-          query,
-          types: 'advertisers,deals,contacts',
-          perTypeLimit: 5
-        },
-        portalId
-      );
+  const requests = [];
 
-  return normalizeCompanyResearchBody(body);
+  if (domain) {
+    requests.push(searchAdvertisersByDomain(domain, portalId));
+  }
+
+  requests.push(searchAdvertisers(query, portalId));
+  requests.push(searchContacts(query, portalId));
+
+  const bodies = (await Promise.all(requests)).filter(Boolean);
+  const merged = mergeResearchBodies(bodies);
+
+  if (!merged.ok) {
+    return merged;
+  }
+
+  if (!merged.sections.length) {
+    const fallback = await postCard(
+      '/universal-search',
+      {
+        query,
+        types: 'advertisers,contacts',
+        perTypeLimit: DEFAULT_LIMIT
+      },
+      portalId
+    );
+    return normalizeCompanyResearchBody(fallback);
+  }
+
+  return { ok: true, sections: merged.sections, query };
 }
 
 export async function researchContact(properties = {}, portalId) {
-  const { domain, query } = getContactSearchQuery(properties);
+  const { contactQuery, advertiserQuery, domain, email, name } =
+    getContactSearchQueries(properties);
 
-  if (!query) {
+  if (!contactQuery && !advertiserQuery) {
     return {
       ok: false,
       message: 'Add an email or company to search Hi Energy AI.'
     };
   }
 
-  const body = await postCard(
-    '/universal-search',
-    {
-      query: domain || query,
-      types: 'advertisers,deals,contacts',
-      perTypeLimit: 5
-    },
-    portalId
-  );
+  const requests = [];
 
-  return normalizeCompanyResearchBody(body);
+  if (contactQuery) {
+    requests.push(searchContacts(contactQuery, portalId));
+  }
+
+  if (email && email !== contactQuery) {
+    requests.push(searchContacts(email, portalId));
+  }
+
+  if (name && name !== contactQuery) {
+    requests.push(searchContacts(name, portalId));
+  }
+
+  if (domain) {
+    requests.push(searchAdvertisersByDomain(domain, portalId));
+  }
+
+  if (advertiserQuery) {
+    requests.push(searchAdvertisers(advertiserQuery, portalId));
+  }
+
+  const bodies = (await Promise.all(requests)).filter(Boolean);
+  const merged = mergeResearchBodies(bodies);
+
+  if (!merged.ok) {
+    return merged;
+  }
+
+  if (!merged.sections.length) {
+    const fallbackQuery = domain || contactQuery || advertiserQuery;
+    const fallback = await postCard(
+      '/universal-search',
+      {
+        query: fallbackQuery,
+        types: 'advertisers,contacts',
+        perTypeLimit: DEFAULT_LIMIT
+      },
+      portalId
+    );
+    return normalizeCompanyResearchBody(fallback);
+  }
+
+  return { ok: true, sections: merged.sections, query: contactQuery || advertiserQuery };
 }

@@ -29,14 +29,69 @@ export function getCompanySearchContext(properties = {}) {
 }
 
 export function getContactSearchQuery(properties = {}) {
+  const queries = getContactSearchQueries(properties);
+  return {
+    domain: queries.domain,
+    query: queries.contactQuery,
+    email: queries.email
+  };
+}
+
+export function getContactSearchQueries(properties = {}) {
   const email = properties.email || '';
   const domain = domainFromEmail(email);
-  const query =
-    domain ||
-    properties.company ||
-    [properties.firstname, properties.lastname].filter(Boolean).join(' ');
+  const name = [properties.firstname, properties.lastname].filter(Boolean).join(' ');
+  const company = properties.company || '';
 
-  return { domain, query, email };
+  return {
+    email,
+    domain,
+    name,
+    company,
+    contactQuery: email || name || company,
+    advertiserQuery: domain || company || name
+  };
+}
+
+export function mergeResearchBodies(bodies = []) {
+  const sections = [];
+  const seen = new Set();
+  let firstError = null;
+
+  for (const body of bodies) {
+    const normalized = normalizeCompanyResearchBody(body);
+    if (!normalized.ok) {
+      firstError = firstError || normalized;
+      continue;
+    }
+
+    for (const section of normalized.sections || []) {
+      let merged = sections.find((entry) => entry.type === section.type);
+      if (!merged) {
+        merged = {
+          type: section.type,
+          total: 0,
+          rows: []
+        };
+        sections.push(merged);
+      }
+
+      for (const row of section.rows || []) {
+        const rowKey = `${section.type}:${row.id || row.label}`;
+        if (seen.has(rowKey)) continue;
+        seen.add(rowKey);
+        merged.rows.push(row);
+      }
+
+      merged.total = merged.rows.length;
+    }
+  }
+
+  if (!sections.length && firstError) {
+    return firstError;
+  }
+
+  return { ok: true, sections };
 }
 
 export function normalizeCompanyResearchBody(body) {

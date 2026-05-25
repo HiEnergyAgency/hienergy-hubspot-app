@@ -26,10 +26,13 @@ HubSpot CRM record (company / contact)
         │  HubSpot signature validation
         │  portalId → API key lookup
         ▼
-  Hi Energy MCP (https://app.hienergy.ai/mcp)
+  Hi Energy REST API (https://app.hienergy.ai/api/v1)
+        │  X-Api-Key
+        ▼
+  /search, /advertisers, /advertisers/search_by_domain, /contacts
 ```
 
-Card and settings requests never expose the Hi Energy API key in the browser. HubSpot signs each `hubspot.fetch()` call; Hi Energy validates the signature server-side, resolves the portal’s API key, then calls MCP.
+Card and settings requests never expose the Hi Energy API key in the browser. HubSpot signs each `hubspot.fetch()` call; Hi Energy validates the signature server-side, resolves the portal’s API key, then calls the [public REST API](https://app.hienergy.ai/api_documentation) documented at `/api/v1`.
 
 ### Breeze Studio (agent tools)
 
@@ -78,6 +81,7 @@ For development, you can also configure portal credentials on the Hi Energy back
 |----------|---------|
 | `HIENERGY_HUBSPOT_PORTAL_LOOKUP_URL` | Production portal → API key lookup |
 | `HIENERGY_HUBSPOT_PORTAL_KEYS` | Dev-only JSON map (`{"48470442":"your-key"}`) |
+| `HIENERGY_API_BASE` | `https://app.hienergy.ai/api/v1` (REST API base URL) |
 | `HUBSPOT_CLIENT_SECRET` | Validates HubSpot-signed card/settings requests |
 
 ### Add CRM cards
@@ -161,6 +165,8 @@ Required Hi Energy backend endpoints before public launch:
 - `POST /hubspot/settings/validate` — validate API keys
 - `POST /hubspot/cards/universal-search`
 - `POST /hubspot/cards/advertiser-by-domain`
+- `POST /hubspot/cards/search-advertisers`
+- `POST /hubspot/cards/search-contacts`
 - `/hubspot/breeze/tools/*` — optional Breeze agent tools
 
 ## Environment

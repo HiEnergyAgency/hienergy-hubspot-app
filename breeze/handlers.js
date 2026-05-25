@@ -2,6 +2,8 @@ const {
   universalSearch,
   advertiserByDomain,
   searchAdvertisers,
+  searchAdvertisersRaw,
+  searchContacts,
   recommendReport,
   validateApiKey
 } = require('../src/app/app.functions/lib/hienergy-client');
@@ -83,7 +85,7 @@ async function handleAdvertiserByDomain(req) {
 
 async function handleSearchAdvertisers(req) {
   return runAgentTool(req, async (fields, secrets) =>
-    searchAdvertisers(fields.query || fields.name || fields.q, secrets, {
+    searchAdvertisersRaw(fields.query || fields.name || fields.q, secrets, {
       vertical: fields.vertical,
       network: fields.network,
       country: fields.country,
@@ -113,6 +115,25 @@ async function handleCardAdvertiserByDomain(req) {
   return runSignedRequest(req, async (body, secrets) => advertiserByDomain(body.domain, secrets));
 }
 
+async function handleCardSearchAdvertisers(req) {
+  return runSignedRequest(req, async (body, secrets) =>
+    searchAdvertisers(body.query || body.q || body.name, secrets, {
+      vertical: body.vertical,
+      network: body.network,
+      country: body.country,
+      limit: body.limit || body.perTypeLimit || body.per_type_limit || 10
+    })
+  );
+}
+
+async function handleCardSearchContacts(req) {
+  return runSignedRequest(req, async (body, secrets) =>
+    searchContacts(body.query || body.q || body.email, secrets, {
+      limit: body.limit || body.perTypeLimit || body.per_type_limit || 10
+    })
+  );
+}
+
 async function handleSettingsValidate(req) {
   return runSignedRequest(req, async (body, secrets) => validateApiKey(body.apiKey, secrets));
 }
@@ -124,6 +145,8 @@ const ROUTES = {
   '/hubspot/breeze/tools/recommend-report': handleRecommendReport,
   '/hubspot/cards/universal-search': handleCardUniversalSearch,
   '/hubspot/cards/advertiser-by-domain': handleCardAdvertiserByDomain,
+  '/hubspot/cards/search-advertisers': handleCardSearchAdvertisers,
+  '/hubspot/cards/search-contacts': handleCardSearchContacts,
   '/hubspot/settings/validate': handleSettingsValidate
 };
 
@@ -154,6 +177,8 @@ module.exports = {
   handleRecommendReport,
   handleCardUniversalSearch,
   handleCardAdvertiserByDomain,
+  handleCardSearchAdvertisers,
+  handleCardSearchContacts,
   handleSettingsValidate,
   ROUTES
 };
