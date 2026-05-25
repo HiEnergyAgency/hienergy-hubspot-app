@@ -11,7 +11,8 @@ import {
 import {
   APP_ORIGIN,
   getCompanySearchContext,
-  researchCompany
+  researchCompany,
+  SETTINGS_HINT
 } from './lib/companyResearch';
 import { ResearchSections } from './lib/ResearchResults';
 
@@ -74,6 +75,7 @@ function CompanyCard({ context }) {
         <Alert title="Hi Energy AI" variant="warning">
           {state.error}
         </Alert>
+        <Text variant="microcopy">{SETTINGS_HINT}</Text>
         <Button variant="primary" onClick={handleResearch} disabled={!query}>
           Research company
         </Button>

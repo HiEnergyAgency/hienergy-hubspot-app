@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hi Energy AI — HubSpot setup guide</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --text: #1f2937;
+        --muted: #4b5563;
+        --border: #e5e7eb;
+        --accent: #111827;
+        --bg: #ffffff;
+        --soft: #f9fafb;
+      }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        line-height: 1.6;
+        color: var(--text);
+        background: var(--bg);
+      }
+      main {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 48px 24px 80px;
+      }
+      h1, h2, h3 { color: var(--accent); line-height: 1.25; }
+      h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+      .lede { color: var(--muted); font-size: 1.05rem; }
+      section { margin-top: 2.5rem; }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.95rem;
+      }
+      th, td {
+        border: 1px solid var(--border);
+        padding: 0.65rem 0.75rem;
+        text-align: left;
+        vertical-align: top;
+      }
+      th { background: var(--soft); }
+      code { background: var(--soft); padding: 0.1rem 0.35rem; border-radius: 4px; }
+      ol, ul { padding-left: 1.25rem; }
+      a { color: #0f766e; }
+      .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Hi Energy AI — HubSpot setup guide</h1>
+      <p class="lede">
+        Connect Hi Energy affiliate intelligence to HubSpot CRM with OAuth install and an API key.
+      </p>
+
+      <section>
+        <h2>Overview</h2>
+        <ul>
+          <li><strong>Company records</strong> — Research advertisers and deals by domain or company name</li>
+          <li><strong>Contact records</strong> — Search advertisers, deals, and contacts from email or company</li>
+          <li><strong>Research company</strong> — One-click research from the company record sidebar</li>
+        </ul>
+        <p>
+          Hi Energy data is fetched server-side with your API key and is not written into HubSpot CRM
+          properties by default.
+        </p>
+      </section>
+
+      <section>
+        <h2>Requirements</h2>
+        <ul>
+          <li>Permission to install Marketplace apps in HubSpot</li>
+          <li>Active Hi Energy AI subscription with API access</li>
+          <li>
+            Hi Energy API key —
+            <a href="https://app.hienergy.ai/api_documentation/api_key">create one in Hi Energy</a>
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Install the app</h2>
+        <ol>
+          <li>Open the Hi Energy AI listing on the HubSpot Marketplace.</li>
+          <li>Click <strong>Install app</strong> and choose your HubSpot account.</li>
+          <li>Review OAuth scopes and click <strong>Connect app</strong>.</li>
+        </ol>
+        <table>
+          <thead>
+            <tr><th>Scope</th><th>Why Hi Energy AI needs it</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>crm.objects.companies.read</code></td>
+              <td>Read company domain and name to research advertisers</td>
+            </tr>
+            <tr>
+              <td><code>crm.objects.contacts.read</code></td>
+              <td>Read contact email and company to run Hi Energy search</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Connect your Hi Energy API key</h2>
+        <ol>
+          <li>In HubSpot, open <strong>Connected apps</strong>.</li>
+          <li>Click <strong>Hi Energy AI</strong>.</li>
+          <li>Open the <strong>Settings</strong> tab.</li>
+          <li>Paste your Hi Energy API key and click <strong>Save and test connection</strong>.</li>
+        </ol>
+        <p>
+          Need help? Email
+          <a href="mailto:support@hienergy.ai">support@hienergy.ai</a>.
+        </p>
+      </section>
+
+      <section>
+        <h2>Add CRM cards</h2>
+        <p>App cards are not added automatically. After install, add them from the record customize screen.</p>
+        <h3>Company tab — Hi Energy company research</h3>
+        <ol>
+          <li>Open a company record → <strong>Customize</strong> → <strong>Default view</strong>.</li>
+          <li>In <strong>Card library</strong>, filter <strong>App</strong> and add <strong>Hi Energy company research</strong>.</li>
+        </ol>
+        <h3>Company sidebar — Research company</h3>
+        <ol>
+          <li>On the same customize screen, open the right sidebar <strong>Card library</strong>.</li>
+          <li>Add <strong>Research company</strong>.</li>
+        </ol>
+        <h3>Contact tab — Hi Energy contact search</h3>
+        <ol>
+          <li>Open a contact record → <strong>Customize</strong> → <strong>Default view</strong>.</li>
+          <li>Add <strong>Hi Energy contact search</strong> from the App card library.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Troubleshooting</h2>
+        <table>
+          <thead>
+            <tr><th>Issue</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cards ask for an API key</td>
+              <td>Add your key in <strong>Connected apps → Hi Energy AI → Settings</strong>.</td>
+            </tr>
+            <tr>
+              <td>No matches</td>
+              <td>Confirm company domain or contact email/company is populated in HubSpot.</td>
+            </tr>
+            <tr>
+              <td>Cards missing</td>
+              <td>Add app cards through <strong>Customize → Card library → App</strong>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Support &amp; legal</h2>
+        <table>
+          <tbody>
+            <tr><th>Support</th><td><a href="https://app.hienergy.ai">app.hienergy.ai</a></td></tr>
+            <tr><th>Email</th><td><a href="mailto:support@hienergy.ai">support@hienergy.ai</a></td></tr>
+            <tr><th>API docs</th><td><a href="https://app.hienergy.ai/api_documentation">app.hienergy.ai/api_documentation</a></td></tr>
+            <tr><th>Privacy</th><td><a href="https://app.hienergy.ai/privacy_policy">Privacy policy</a></td></tr>
+            <tr><th>Terms</th><td><a href="https://app.hienergy.ai/terms_of_service">Terms of service</a></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <p class="footer">Hi Energy AI · HubSpot Marketplace integration</p>
+    </main>
+  </body>
+</html>

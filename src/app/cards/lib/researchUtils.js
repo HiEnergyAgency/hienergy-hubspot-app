@@ -1,4 +1,17 @@
 export const APP_ORIGIN = 'https://app.hienergy.ai';
+export const SETTINGS_HINT =
+  'Connect your API key in Connected apps → Hi Energy AI → Settings.';
+
+export function formatResearchError(message) {
+  const text = message || 'Hi Energy request failed.';
+  if (/connected apps|→ settings/i.test(text)) {
+    return text;
+  }
+  if (/401|403|portal|signature|api key|configured for hubspot portal/i.test(text)) {
+    return `${text} ${SETTINGS_HINT}`;
+  }
+  return text;
+}
 
 export function domainFromWebsite(website) {
   let raw = String(website || '').trim();
@@ -98,7 +111,7 @@ export function normalizeCompanyResearchBody(body) {
   if (!body?.ok) {
     return {
       ok: false,
-      message: body?.message || 'Hi Energy request failed.'
+      message: formatResearchError(body?.message || 'Hi Energy request failed.')
     };
   }
 

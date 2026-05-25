@@ -7,6 +7,7 @@ marketplace/.browser-profile/
 .DS_Store
 *.log
 .hubspot/
+.playwright-cli/
 
 # HubSpot config file
 hubspot.config.yml

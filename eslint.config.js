@@ -21,7 +21,9 @@ export default [
         fetch: 'readonly',
         Buffer: 'readonly',
         console: 'readonly',
-        URL: 'readonly'
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        __dirname: 'readonly'
       }
     }
   }

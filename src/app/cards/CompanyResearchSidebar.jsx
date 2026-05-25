@@ -12,7 +12,8 @@ import {
   APP_ORIGIN,
   getCompanySearchContext,
   researchCompany,
-  researchSummary
+  researchSummary,
+  SETTINGS_HINT
 } from './lib/companyResearch';
 
 hubspot.extend(({ context, actions }) => (
@@ -96,9 +97,12 @@ function CompanyResearchSidebar({ context, addAlert }) {
       {state.loading ? <LoadingSpinner label="Researching in Hi Energy AI…" /> : null}
 
       {state.error ? (
-        <Alert title="Hi Energy AI" variant="warning">
-          {state.error}
-        </Alert>
+        <>
+          <Alert title="Hi Energy AI" variant="warning">
+            {state.error}
+          </Alert>
+          <Text variant="microcopy">{SETTINGS_HINT}</Text>
+        </>
       ) : null}
 
       {state.researched && !state.error ? (

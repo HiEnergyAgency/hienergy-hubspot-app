@@ -13,7 +13,8 @@ const {
   agentToolSuccess,
   agentToolFailure
 } = require('../src/app/app.functions/lib/hubspot-agent-tool');
-const { resolveSecretsForPortal } = require('./portal-credentials');
+const { resolveSecretsForPortal, getBaseSecrets } = require('./portal-credentials');
+const { savePortalCredentials } = require('./portal-storage');
 
 const BREEZE_TOOL_BASE_URL = 'https://app.hienergy.ai/hubspot/breeze/tools';
 
@@ -30,15 +31,17 @@ function readPortalId(body) {
   return payload.portalId ?? payload.hubId ?? payload.origin?.portalId ?? null;
 }
 
-async function runSignedRequest(req, handler) {
+async function runSignedRequest(req, handler, options = {}) {
   try {
     if (!validateHubSpotRequest(req, getHubSpotClientSecret())) {
       return { statusCode: 401, body: { ok: false, message: 'Invalid HubSpot signature.', error: 'INVALID_SIGNATURE' } };
     }
 
     const portalId = readPortalId(req.body);
-    const secrets = await resolveSecretsForPortal(portalId);
-    const result = await handler(req.body || {}, secrets);
+    const secrets = options.useBaseSecretsOnly
+      ? getBaseSecrets()
+      : await resolveSecretsForPortal(portalId);
+    const result = await handler(req.body || {}, secrets, portalId);
     return { statusCode: result.ok === false ? 400 : 200, body: result };
   } catch (err) {
     return {
@@ -135,7 +138,39 @@ async function handleCardSearchContacts(req) {
 }
 
 async function handleSettingsValidate(req) {
-  return runSignedRequest(req, async (body, secrets) => validateApiKey(body.apiKey, secrets));
+  return runSignedRequest(
+    req,
+    async (body, secrets) => validateApiKey(body.apiKey, secrets),
+    { useBaseSecretsOnly: true }
+  );
+}
+
+async function handleSettingsSave(req) {
+  return runSignedRequest(
+    req,
+    async (body, secrets, portalId) => {
+      const apiKey = String(body.apiKey || '').trim();
+      if (!apiKey) {
+        return {
+          ok: false,
+          error: 'MISSING_API_KEY',
+          message: 'Enter your Hi Energy API key.'
+        };
+      }
+
+      const validation = await validateApiKey(apiKey, secrets);
+      if (!validation.ok) {
+        return validation;
+      }
+
+      await savePortalCredentials(portalId, { apiKey });
+      return {
+        ok: true,
+        message: 'Hi Energy AI is connected for this HubSpot account.'
+      };
+    },
+    { useBaseSecretsOnly: true }
+  );
 }
 
 const ROUTES = {
@@ -147,7 +182,8 @@ const ROUTES = {
   '/hubspot/cards/advertiser-by-domain': handleCardAdvertiserByDomain,
   '/hubspot/cards/search-advertisers': handleCardSearchAdvertisers,
   '/hubspot/cards/search-contacts': handleCardSearchContacts,
-  '/hubspot/settings/validate': handleSettingsValidate
+  '/hubspot/settings/validate': handleSettingsValidate,
+  '/hubspot/settings': handleSettingsSave
 };
 
 async function dispatchHubSpotRequest(req) {
@@ -180,5 +216,6 @@ module.exports = {
   handleCardSearchAdvertisers,
   handleCardSearchContacts,
   handleSettingsValidate,
+  handleSettingsSave,
   ROUTES
 };

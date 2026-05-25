@@ -11,7 +11,8 @@ import {
 import {
   APP_ORIGIN,
   getContactSearchQuery,
-  researchContact
+  researchContact,
+  SETTINGS_HINT
 } from './lib/companyResearch';
 import { ResearchSections } from './lib/ResearchResults';
 
@@ -74,6 +75,7 @@ function ContactCard({ context }) {
         <Alert title="Hi Energy AI" variant="warning">
           {state.error}
         </Alert>
+        <Text variant="microcopy">{SETTINGS_HINT}</Text>
         <Button href={{ url: `${APP_ORIGIN}/api_documentation/api_key`, external: true }}>
           Get Hi Energy API key
         </Button>

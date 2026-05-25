@@ -4,7 +4,9 @@ import {
   getCompanySearchContext,
   getContactSearchQueries,
   mergeResearchBodies,
-  normalizeCompanyResearchBody
+  normalizeCompanyResearchBody,
+  formatResearchError,
+  SETTINGS_HINT
 } from './researchUtils';
 
 export {
@@ -16,7 +18,9 @@ export {
   getContactSearchQuery,
   mergeResearchBodies,
   normalizeCompanyResearchBody,
-  researchSummary
+  researchSummary,
+  formatResearchError,
+  SETTINGS_HINT
 } from './researchUtils';
 
 const CARDS_BASE = `${APP_ORIGIN}/hubspot/cards`;
@@ -32,9 +36,13 @@ async function postCard(path, body, portalId) {
   });
 
   if (!response.ok) {
+    const message =
+      response.status === 401
+        ? 'Hi Energy could not verify this HubSpot request.'
+        : `Hi Energy request failed (${response.status}).`;
     return {
       ok: false,
-      message: `Hi Energy request failed (${response.status}).`
+      message: formatResearchError(message)
     };
   }
 

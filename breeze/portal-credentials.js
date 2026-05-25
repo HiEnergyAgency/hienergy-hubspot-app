@@ -1,5 +1,6 @@
 const DEFAULT_MCP_URL = 'https://app.hienergy.ai/mcp';
 const DEFAULT_API_BASE = 'https://app.hienergy.ai/api/v1';
+const { loadPortalRecord } = require('./portal-storage');
 
 async function resolveSecretsForPortal(portalId) {
   const id = portalId == null ? '' : String(portalId);
@@ -25,24 +26,20 @@ async function resolveSecretsForPortal(portalId) {
             payload.api_base ||
             payload.apiBase ||
             process.env.HIENERGY_API_BASE ||
-            'https://app.hienergy.ai/api/v1',
+            DEFAULT_API_BASE,
           HIENERGY_MCP_URL: payload.mcp_url || payload.mcpUrl || process.env.HIENERGY_MCP_URL || DEFAULT_MCP_URL
         };
       }
     }
   }
 
-  const mapJson = process.env.HIENERGY_HUBSPOT_PORTAL_KEYS;
-  if (mapJson) {
-    const map = JSON.parse(mapJson);
-    const apiKey = map[id];
-    if (apiKey) {
-      return {
-        HIENERGY_API_KEY: apiKey,
-        HIENERGY_API_BASE: process.env.HIENERGY_API_BASE || DEFAULT_API_BASE,
-        HIENERGY_MCP_URL: process.env.HIENERGY_MCP_URL || DEFAULT_MCP_URL
-      };
-    }
+  const stored = await loadPortalRecord(id);
+  if (stored?.apiKey) {
+    return {
+      HIENERGY_API_KEY: stored.apiKey,
+      HIENERGY_API_BASE: stored.apiBase || process.env.HIENERGY_API_BASE || DEFAULT_API_BASE,
+      HIENERGY_MCP_URL: stored.mcpUrl || process.env.HIENERGY_MCP_URL || DEFAULT_MCP_URL
+    };
   }
 
   if (process.env.HIENERGY_API_KEY) {
@@ -56,6 +53,14 @@ async function resolveSecretsForPortal(portalId) {
   throw new Error(`No Hi Energy API key configured for HubSpot portal ${id}.`);
 }
 
+function getBaseSecrets() {
+  return {
+    HIENERGY_API_BASE: process.env.HIENERGY_API_BASE || DEFAULT_API_BASE,
+    HIENERGY_MCP_URL: process.env.HIENERGY_MCP_URL || DEFAULT_MCP_URL
+  };
+}
+
 module.exports = {
-  resolveSecretsForPortal
+  resolveSecretsForPortal,
+  getBaseSecrets
 };

@@ -24,6 +24,7 @@ describe('breeze handlers', () => {
     assert.ok(ROUTES['/hubspot/cards/search-advertisers']);
     assert.ok(ROUTES['/hubspot/cards/search-contacts']);
     assert.ok(ROUTES['/hubspot/settings/validate']);
+    assert.ok(ROUTES['/hubspot/settings']);
     assert.ok(ROUTES['/hubspot/breeze/tools/universal-search']);
   });
 
@@ -107,6 +108,59 @@ describe('breeze handlers', () => {
     } finally {
       global.fetch = originalFetch;
       delete process.env.HIENERGY_HUBSPOT_PORTAL_KEYS;
+    }
+  });
+
+  it('saves validated API keys for a portal', async () => {
+    const tempDir = require('os').tmpdir();
+    const storePath = require('path').join(tempDir, `portal-save-${Date.now()}.json`);
+    process.env.HIENERGY_HUBSPOT_PORTAL_STORE = storePath;
+
+    const method = 'POST';
+    const requestUri = '/hubspot/settings';
+    const body = '{"portalId":456,"apiKey":"save-key"}';
+    const signature = crypto
+      .createHash('sha256')
+      .update(`test-secret${method}${requestUri}${body}`, 'utf8')
+      .digest('hex');
+
+    const originalFetch = global.fetch;
+    global.fetch = async (url) => {
+      if (String(url).includes('/tools')) {
+        return {
+          ok: true,
+          status: 200,
+          text: async () =>
+            JSON.stringify({
+              tools: [],
+              api_version: 'v1',
+              base_url: 'https://app.hienergy.ai'
+            })
+        };
+      }
+
+      return { ok: false, status: 404, text: async () => '{}' };
+    };
+
+    try {
+      const response = await dispatchHubSpotRequest({
+        method,
+        url: requestUri,
+        body: { portalId: 456, apiKey: 'save-key' },
+        headers: { 'x-hubspot-signature': signature },
+        rawBody: body
+      });
+
+      assert.equal(response.statusCode, 200);
+      assert.equal(response.body.ok, true);
+
+      const { loadPortalRecord } = require('../breeze/portal-storage');
+      const saved = await loadPortalRecord(456);
+      assert.equal(saved.apiKey, 'save-key');
+    } finally {
+      global.fetch = originalFetch;
+      delete process.env.HIENERGY_HUBSPOT_PORTAL_STORE;
+      await require('fs/promises').unlink(storePath).catch(() => {});
     }
   });
 });

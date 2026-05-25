@@ -15,14 +15,21 @@ Use this checklist before submitting the listing in your HubSpot developer accou
 - [x] Support block in `app-hsmeta.json`
 - [x] App logo at `src/app/app-logo.png` (512×512, from Hi Energy Chrome extension)
 - [x] `npm run validate` passes locally (27 tests)
-- [x] GitHub Actions CI + deploy workflows (`.github/workflows/`)
+- [x] GitHub Actions CI + deploy workflows (`.github/workflows/ci.yml`)
+- [x] `POST /hubspot/settings` save handler in `breeze/handlers.js`
+- [x] OAuth callback handler (`GET /hubspot/oauth/callback`, token v3)
+- [x] Public setup guide HTML at `breeze/static/integrations/hubspot/index.html`
+- [x] Render deploy blueprint (`render.yaml`)
+- [x] Review credentials template (`marketplace/review-credentials.md`)
+- [ ] Deploy breeze service to `app.hienergy.ai` (route `/hubspot/*` and `/integrations/hubspot`)
 - [ ] `hs project upload` succeeds in GitHub Actions after secrets are configured
 
 ## Hi Energy backend (required before public launch)
 
-- [ ] Deploy `POST https://app.hienergy.ai/hubspot/settings` to store portal → API key mappings
+- [x] Implement `POST /hubspot/settings` in breeze handlers
+- [ ] Deploy `POST https://app.hienergy.ai/hubspot/settings` on production infrastructure
 - [ ] Deploy Breeze webhook routes under `/hubspot/breeze/tools/*` (optional; workflow actions are unpublished until live)
-- [ ] Publish setup guide at a public HTTPS URL for the listing form
+- [ ] Publish setup guide at `https://app.hienergy.ai/integrations/hubspot` (HTML source in repo)
 
 ## HubSpot pre-submission requirements
 

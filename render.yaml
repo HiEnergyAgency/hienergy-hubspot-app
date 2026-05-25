@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: hienergy-hubspot-breeze
+    runtime: node
+    plan: starter
+    buildCommand: npm ci
+    startCommand: node breeze/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: HUBSPOT_CLIENT_SECRET
+        sync: false
+      - key: HUBSPOT_CLIENT_ID
+        sync: false
+      - key: HUBSPOT_REDIRECT_URI
+        value: https://app.hienergy.ai/hubspot/oauth/callback
+      - key: HIENERGY_API_BASE
+        value: https://app.hienergy.ai/api/v1
+      - key: HIENERGY_HUBSPOT_PORTAL_LOOKUP_URL
+        sync: false
+      - key: HIENERGY_HUBSPOT_PORTAL_LOOKUP_TOKEN
+        sync: false
+      - key: HIENERGY_HUBSPOT_PORTAL_STORE
+        value: /var/data/hubspot-portals.json

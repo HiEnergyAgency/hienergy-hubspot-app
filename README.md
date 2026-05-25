@@ -79,10 +79,18 @@ For development, you can also configure portal credentials on the Hi Energy back
 
 | Variable | Purpose |
 |----------|---------|
-| `HIENERGY_HUBSPOT_PORTAL_LOOKUP_URL` | Production portal → API key lookup |
+| `HIENERGY_HUBSPOT_PORTAL_LOOKUP_URL` | Production portal → API key lookup/save |
+| `HIENERGY_HUBSPOT_PORTAL_STORE` | File-backed portal key store (Render disk) |
 | `HIENERGY_HUBSPOT_PORTAL_KEYS` | Dev-only JSON map (`{"48470442":"your-key"}`) |
 | `HIENERGY_API_BASE` | `https://app.hienergy.ai/api/v1` (REST API base URL) |
 | `HUBSPOT_CLIENT_SECRET` | Validates HubSpot-signed card/settings requests |
+| `HUBSPOT_CLIENT_ID` | OAuth callback token exchange |
+
+Deploy the webhook service with `render.yaml` or run locally:
+
+```bash
+HUBSPOT_CLIENT_SECRET=... HIENERGY_HUBSPOT_PORTAL_STORE=/tmp/portals.json npm run breeze:server
+```
 
 ### Add CRM cards
 
@@ -95,8 +103,7 @@ For development, you can also configure portal credentials on the Hi Energy back
 ```
 hienergy-hubspot-app/
 ├── .github/workflows/
-│   ├── ci.yml                   # PR lint + test + project validate
-│   └── deploy.yml               # main → HubSpot upload (auto-deploy)
+│   ├── ci.yml                   # lint, test, validate, HubSpot deploy on main
 ├── hsproject.json
 ├── src/app/
 │   ├── app-hsmeta.json          # OAuth app, marketplace distribution
@@ -114,8 +121,12 @@ hienergy-hubspot-app/
 │   └── workflow-actions/        # Breeze tools (isPublished: false)
 ├── breeze/                      # Hi Energy webhook service
 │   ├── handlers.js              # /hubspot/cards, /settings, /breeze/tools
+│   ├── oauth-callback.js        # OAuth v3 install callback
 │   ├── portal-credentials.js
+│   ├── portal-storage.js
+│   ├── static/integrations/hubspot/index.html
 │   └── server.js
+├── render.yaml                  # Deploy breeze service to Render
 ├── marketplace/
 └── test/                        # 27 unit/integration tests
 ```
@@ -161,6 +172,8 @@ See [`marketplace/SUBMISSION_CHECKLIST.md`](marketplace/SUBMISSION_CHECKLIST.md)
 
 Required Hi Energy backend endpoints before public launch:
 
+- `GET /integrations/hubspot` — public setup guide (served by `breeze/server.js`)
+- `GET /hubspot/oauth/callback` — OAuth v3 install callback
 - `POST /hubspot/settings` — persist portal API keys from settings page
 - `POST /hubspot/settings/validate` — validate API keys
 - `POST /hubspot/cards/universal-search`

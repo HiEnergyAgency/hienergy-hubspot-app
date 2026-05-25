@@ -132,4 +132,9 @@ describe('research utils', () => {
     assert.equal(merged.sections[0].rows.length, 1);
     assert.equal(merged.sections[1].rows.length, 1);
   });
+
+  it('formats card errors with Connected Apps settings guidance', () => {
+    const formatted = utils.formatResearchError('No Hi Energy API key configured for HubSpot portal 123.');
+    assert.match(formatted, /Connected apps → Hi Energy AI → Settings/);
+  });
 });

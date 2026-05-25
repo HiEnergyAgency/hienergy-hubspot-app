@@ -32,8 +32,19 @@ function invokeHandleRequest(method, url, body) {
 }
 
 describe('breeze server', () => {
-  it('rejects non-POST requests', async () => {
-    const res = await invokeHandleRequest('GET', '/hubspot/cards/universal-search');
+  it('serves health and setup guide over GET', async () => {
+    const health = await invokeHandleRequest('GET', '/health');
+    assert.equal(health.statusCode, 200);
+    assert.match(health.body, /hienergy-hubspot-breeze/);
+
+    const guide = await invokeHandleRequest('GET', '/integrations/hubspot');
+    assert.equal(guide.statusCode, 200);
+    assert.match(guide.headers['Content-Type'], /text\/html/);
+    assert.match(guide.body, /HubSpot setup guide/);
+  });
+
+  it('rejects unsupported methods', async () => {
+    const res = await invokeHandleRequest('DELETE', '/hubspot/cards/universal-search');
     assert.equal(res.statusCode, 405);
     assert.match(res.body, /Method not allowed/);
   });
