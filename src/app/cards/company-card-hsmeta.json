@@ -2,10 +2,10 @@
   "uid": "hienergy_company_card",
   "type": "card",
   "config": {
-    "name": "Hi Energy AI",
+    "name": "Hi Energy company research",
     "description": "Search Hi Energy AI advertisers, deals, and contacts. Includes a Research company button on company record pages.",
     "location": "crm.record.tab",
-    "entrypoint": "/extensions/CompanyCard.jsx",
+    "entrypoint": "/app/cards/CompanyCard.jsx",
     "objectTypes": ["companies"]
   }
 }

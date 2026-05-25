@@ -6,12 +6,12 @@ Companion to the [Hi Energy Google Workspace add-on](https://github.com/HiEnergy
 
 ## Features
 
-- **Company card** — Uses `domain` / `website` to find Hi Energy advertisers for that brand
-- **Research company button** — Sidebar card on company records with a one-click Hi Energy research action
-- **Contact card** — Uses email domain or company name for universal search (advertisers, deals, contacts)
-- **Serverless backend** — HubSpot app functions call Hi Energy MCP (`universal_search`, `search_advertisers_by_domain`) with your API key
-- **Breeze agent tools** — After install, add Hi Energy AI tools to Breeze Studio agents (search, domain lookup, reports) backed by the same MCP server
-- **Marketplace-ready** — OAuth, UI extension cards (not deprecated legacy CRM cards), listing copy in `marketplace/listing.md`
+- **Company card** — Research button + full Hi Energy results on company record tabs
+- **Research company sidebar** — One-click research action in the company record sidebar
+- **Contact card** — Uses email domain or company name for universal search
+- **Settings page** — Customers connect their Hi Energy API key in Connected Apps
+- **Breeze agent tools** — Optional Hi Energy tools for Breeze Studio agents (unpublished until webhooks are live)
+- **Marketplace-ready** — OAuth, UI extension cards, listing copy in `marketplace/listing.md`
 
 ## Architecture
 
@@ -20,17 +20,18 @@ HubSpot CRM record (company / contact)
         │
         ▼
   UI Extension card (React)
-        │  hubspot.serverless()
+        │  hubspot.fetch() + portalId
         ▼
-  app.functions/hienergy-*.js
-        │  X-Api-Key + MCP tools/call
+  app.hienergy.ai/hubspot/cards/*
+        │  HubSpot signature validation
+        │  portalId → API key lookup
         ▼
-  https://app.hienergy.ai/mcp
+  Hi Energy MCP (https://app.hienergy.ai/mcp)
 ```
 
-### Breeze Studio (agent tools)
+Card and settings requests never expose the Hi Energy API key in the browser. HubSpot signs each `hubspot.fetch()` call; Hi Energy validates the signature server-side, resolves the portal’s API key, then calls MCP.
 
-HubSpot Breeze agents can call Hi Energy MCP tools through **agent tools** registered by this app. Each tool POSTs to Hi Energy webhooks that proxy to the MCP server.
+### Breeze Studio (agent tools)
 
 ```
 Breeze Studio agent
@@ -45,137 +46,126 @@ Breeze Studio agent
   https://app.hienergy.ai/mcp
 ```
 
-**Setup**
-
-1. Install the Hi Energy AI HubSpot app and set `HIENERGY_API_KEY` in app secrets (same as CRM cards).
-2. Deploy the Breeze webhook service from `breeze/` to Hi Energy infrastructure and route these paths:
-   - `/hubspot/breeze/tools/universal-search`
-   - `/hubspot/breeze/tools/advertiser-by-domain`
-   - `/hubspot/breeze/tools/search-advertisers`
-   - `/hubspot/breeze/tools/recommend-report`
-3. Configure webhook env vars:
-   - `HUBSPOT_CLIENT_SECRET` — your HubSpot app client secret (signature validation)
-   - `HIENERGY_HUBSPOT_PORTAL_LOOKUP_URL` — Hi Energy endpoint that maps HubSpot `portalId` → API key (recommended for production)
-   - or `HIENERGY_HUBSPOT_PORTAL_KEYS` JSON map for local testing
-4. Upload the project: `npm run upload`
-5. In HubSpot: **Breeze → Breeze Studio → Configure agent → Add tool → App tools → Hi Energy AI**
-
-**Direct MCP connection (optional)**
-
-You can also connect Breeze agents directly to the Hi Energy MCP server using a tokenized URL (Streamable HTTP), similar to Zapier:
-
-`https://app.hienergy.ai/mcp?api_key=YOUR_API_KEY`
-
-See [Hi Energy MCP docs](https://app.hienergy.ai/api_documentation/mcp) for OAuth and API-key options.
+Deploy the webhook service in `breeze/` on Hi Energy infrastructure before publishing workflow actions.
 
 ## Prerequisites
 
 - [HubSpot developer account](https://developers.hubspot.com/)
-- [HubSpot CLI](https://developers.hubspot.com/docs/developer-tooling/local-development/hubspot-cli/install-the-cli) (`npm install -g @hubspot/cli`)
-- Hi Energy AI **API key** (from your Hi Energy account)
+- [HubSpot CLI](https://developers.hubspot.com/docs/developer-tooling/local-development/hubspot-cli/install-the-cli)
+- Hi Energy AI **API key**
 
 ## Quick start
 
 ```bash
 cd hienergy-hubspot-app
 npm install
-cd src/app/extensions && npm install && cd ../../..
-cd src/app/app.functions && npm install && cd ../../..
-```
-
-### 1. Authenticate HubSpot CLI
-
-```bash
+npm ci --prefix src/app/cards
+npm ci --prefix src/app/settings
+npm ci --prefix src/app/app.functions
+cp .env.example .env   # local reference only
 hs account auth
+npm run validate
+npm run upload
 ```
 
-### 2. Create or link a HubSpot app
+### Connect Hi Energy in HubSpot
 
-In [HubSpot Developer](https://app.hubspot.com/developer):
+After install: **Connected apps → Hi Energy AI → Settings → Save and test connection**
 
-1. Create a new **app** (Developer platform 2025.2+)
-2. Note the app ID and configure OAuth redirect URLs
-3. Link this project: `hs project upload` from this directory
+For development, you can also configure portal credentials on the Hi Energy backend:
 
-### 3. Set app secrets
+| Variable | Purpose |
+|----------|---------|
+| `HIENERGY_HUBSPOT_PORTAL_LOOKUP_URL` | Production portal → API key lookup |
+| `HIENERGY_HUBSPOT_PORTAL_KEYS` | Dev-only JSON map (`{"48470442":"your-key"}`) |
+| `HUBSPOT_CLIENT_SECRET` | Validates HubSpot-signed card/settings requests |
 
-In the HubSpot app settings → **Secrets**:
+### Add CRM cards
 
-| Secret | Value |
-|--------|--------|
-| `HIENERGY_API_KEY` | Your Hi Energy API key |
-| `HIENERGY_MCP_URL` | `https://app.hienergy.ai/mcp` (optional) |
-
-### 4. Upload and test
-
-```bash
-npm run dev    # local dev loop
-npm run upload # deploy to HubSpot
-```
-
-Open a **company** or **contact** in HubSpot CRM → **Hi Energy AI** tab.
-
-On **company** records, add the **Research company** sidebar card:
-
-1. Open a company record → **Customize** (top of middle column) → **Default view**
-2. In the right sidebar, open **Card library** → filter **App**
-3. Add **Research company** (Hi Energy AI)
-
-The sidebar card shows a **Research company** button on every company page. The Hi Energy AI tab shows the same action with full results.
+1. Open a company or contact record → **Customize** → **Default view**
+2. **Card library** → filter **App**
+3. Add **Hi Energy company research**, **Research company**, and/or **Hi Energy contact search**
 
 ## Project layout
 
 ```
 hienergy-hubspot-app/
+├── .github/workflows/
+│   ├── ci.yml                   # PR lint + test + project validate
+│   └── deploy.yml               # main → HubSpot upload (auto-deploy)
 ├── hsproject.json
 ├── src/app/
-│   ├── app-hsmeta.json          # App config, OAuth scopes, permitted URLs
-│   ├── extensions/
-│   │   ├── CompanyCard.jsx      # CRM tab on companies
-│   │   ├── CompanyResearchSidebar.jsx  # Research company button (sidebar)
-│   │   ├── ContactCard.jsx      # CRM card on contacts
-│   │   └── *-hsmeta.json
-│   └── app.functions/
-│       ├── hienergy-search.js
-│       ├── hienergy-advertiser-by-domain.js
-│       ├── lib/hienergy-client.js
-│       └── lib/hubspot-agent-tool.js
-│   └── workflow-actions/        # Breeze agent tools
-│       └── hienergy-*-hsmeta.json
-├── breeze/                      # Webhook service for Breeze agent tools
-│   ├── handlers.js
+│   ├── app-hsmeta.json          # OAuth app, marketplace distribution
+│   ├── app-logo.png             # Marketplace logo (from Chrome extension)
+│   ├── cards/
+│   │   ├── CompanyCard.jsx
+│   │   ├── CompanyResearchSidebar.jsx
+│   │   ├── ContactCard.jsx
+│   │   └── lib/
+│   │       ├── companyResearch.js   # hubspot.fetch wrappers
+│   │       ├── researchUtils.js     # pure helpers (unit tested)
+│   │       └── ResearchResults.jsx  # shared result UI
+│   ├── settings/SettingsPage.jsx
+│   ├── app.functions/lib/       # MCP client + signature helpers
+│   └── workflow-actions/        # Breeze tools (isPublished: false)
+├── breeze/                      # Hi Energy webhook service
+│   ├── handlers.js              # /hubspot/cards, /settings, /breeze/tools
 │   ├── portal-credentials.js
 │   └── server.js
-├── marketplace/listing.md
-└── test/
+├── marketplace/
+└── test/                        # 27 unit/integration tests
 ```
+
+## CI/CD
+
+GitHub Actions deploys to [Hi Energy HubSpot project](https://app.hubspot.com/developer-projects/48470442/project/hienergy-hubspot) on every push to `main`.
+
+Add these repository secrets ([HubSpot GitHub Actions guide](https://developers.hubspot.com/docs/developer-tooling/third-party-tools/set-up-github-actions)):
+
+| Secret | Value |
+|--------|--------|
+| `HUBSPOT_ACCOUNT_ID` | `48470442` |
+| `HUBSPOT_PERSONAL_ACCESS_KEY` | Your HubSpot developer PAK |
+
+Pull requests run lint, tests, and `hs project validate`. Pushes to `main` run tests, then `hs project upload` (auto-deploy is enabled on the HubSpot project).
 
 ## OAuth scopes
 
-- `crm.objects.companies.read` — read company domain/name
-- `crm.objects.contacts.read` — read contact email/company
 - `oauth` — Marketplace install flow
-
-Hi Energy scopes (Gmail, Sheets, etc.) are **not** requested — only Hi Energy API via server-side key.
-
-## Marketplace submission
-
-1. Complete [listing requirements](https://developers.hubspot.com/docs/apps/developer-platform/list-apps/listing-your-app/app-marketplace-listing-requirements)
-2. Use copy from `marketplace/listing.md`
-3. Upload 1280×800 screenshots of company + contact cards
-4. Submit for [HubSpot Ecosystem Quality review](https://ecosystem.hubspot.com/marketplace/)
-
-See also: [OAuth quickstart](https://developers.hubspot.com/docs/apps/developer-platform/build-apps/authentication/oauth/oauth-quickstart-guide), [UI extensions examples](https://github.com/hubspotdev/ui-extensions-examples).
+- `crm.objects.companies.read` — company domain/name
+- `crm.objects.contacts.read` — contact email/company
 
 ## Tests
 
 ```bash
-npm test
+npm run validate    # lint + all tests
+npm test            # 27 tests across cards, MCP client, Breeze webhooks
+npm run test:breeze # webhook handler tests only
 ```
+
+Coverage includes:
+
+- Card research helpers (`researchUtils`)
+- Hi Energy MCP response formatting (`hienergy-client`)
+- HubSpot signature validation (`hubspot-agent-tool`, `breeze/handlers`)
+- Portal credential resolution (`portal-credentials`, `resolve-secrets`)
+- Webhook HTTP server behavior (`breeze/server`)
+
+## Marketplace submission
+
+See [`marketplace/SUBMISSION_CHECKLIST.md`](marketplace/SUBMISSION_CHECKLIST.md) and [`marketplace/listing.md`](marketplace/listing.md).
+
+Required Hi Energy backend endpoints before public launch:
+
+- `POST /hubspot/settings` — persist portal API keys from settings page
+- `POST /hubspot/settings/validate` — validate API keys
+- `POST /hubspot/cards/universal-search`
+- `POST /hubspot/cards/advertiser-by-domain`
+- `/hubspot/breeze/tools/*` — optional Breeze agent tools
 
 ## Environment
 
-Copy `.env.example` for local reference. Production credentials live in **HubSpot app secrets**, not in the repo.
+Copy `.env.example` for local reference. Production credentials live in **GitHub secrets**, **HubSpot app secrets**, and Hi Energy infrastructure — not in the repo.
 
 ## License
 

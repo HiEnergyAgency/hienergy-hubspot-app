@@ -2,10 +2,10 @@
   "uid": "hienergy_contact_card",
   "type": "card",
   "config": {
-    "name": "Hi Energy AI",
+    "name": "Hi Energy contact search",
     "description": "Advertisers, deals, and contacts for this person's domain",
     "location": "crm.record.tab",
-    "entrypoint": "/extensions/ContactCard.jsx",
+    "entrypoint": "/app/cards/ContactCard.jsx",
     "objectTypes": ["contacts"]
   }
 }

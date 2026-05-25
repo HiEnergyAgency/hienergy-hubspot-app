@@ -139,11 +139,51 @@ function adminUrl(type, row) {
   return origin;
 }
 
+async function validateApiKey(apiKey, secrets = {}) {
+  const mcpUrl = (secrets.HIENERGY_MCP_URL || DEFAULT_MCP_URL).replace(/\/$/, '');
+  const key = String(apiKey || '').trim();
+  if (!key) {
+    return { ok: false, error: 'MISSING_API_KEY', message: 'Enter your Hi Energy API key.' };
+  }
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'MCP-Protocol-Version': MCP_PROTOCOL,
+    'X-Api-Key': key
+  };
+
+  const initPayload = {
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'initialize',
+    params: {
+      protocolVersion: MCP_PROTOCOL,
+      clientInfo: { name: CLIENT_NAME, version: CLIENT_VERSION }
+    }
+  };
+
+  const initRes = await fetch(mcpUrl, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(initPayload)
+  });
+
+  if (!initRes.ok) {
+    return {
+      ok: false,
+      error: 'MCP_INIT_FAILED',
+      message: `Hi Energy rejected this API key (${initRes.status}).`
+    };
+  }
+
+  return { ok: true, message: 'Hi Energy API key is valid.' };
+}
+
 async function callMcpTool(toolName, toolArgs, secrets) {
   const mcpUrl = (secrets.HIENERGY_MCP_URL || DEFAULT_MCP_URL).replace(/\/$/, '');
   const apiKey = secrets.HIENERGY_API_KEY;
   if (!apiKey) {
-    return { ok: false, error: 'MISSING_API_KEY', message: 'Set HIENERGY_API_KEY in app secrets.' };
+    return { ok: false, error: 'MISSING_API_KEY', message: 'Connect Hi Energy AI in Connected Apps → Settings.' };
   }
 
   const headers = {
@@ -314,6 +354,7 @@ async function recommendReport(goal, secrets, options) {
 
 module.exports = {
   callMcpTool,
+  validateApiKey,
   universalSearch,
   advertiserByDomain,
   searchAdvertisers,

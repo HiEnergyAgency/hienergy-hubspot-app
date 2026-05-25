@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   hubspot,
   Text,
-  Link,
   Flex,
   Divider,
   LoadingSpinner,
@@ -14,6 +13,7 @@ import {
   getCompanySearchContext,
   researchCompany
 } from './lib/companyResearch';
+import { ResearchSections } from './lib/ResearchResults';
 
 hubspot.extend(({ context }) => <CompanyCard context={context} />);
 
@@ -41,7 +41,7 @@ function CompanyCard({ context }) {
     setState({ loading: true, researched: false, data: null, error: null });
 
     try {
-      const result = await researchCompany(props);
+      const result = await researchCompany(props, context?.portal?.id);
 
       if (!result.ok) {
         setState({
@@ -77,8 +77,8 @@ function CompanyCard({ context }) {
         <Button variant="primary" onClick={handleResearch} disabled={!query}>
           Research company
         </Button>
-        <Button href={{ url: `${APP_ORIGIN}/settings`, external: true }}>
-          Connect Hi Energy AI
+        <Button href={{ url: `${APP_ORIGIN}/api_documentation/api_key`, external: true }}>
+          Get Hi Energy API key
         </Button>
       </Flex>
     );
@@ -103,13 +103,10 @@ function CompanyCard({ context }) {
   return (
     <Flex direction="column" gap="sm">
       <Text variant="microcopy">{label}</Text>
-      {sections.length === 0 ? (
-        <Text>No Hi Energy matches for this company.</Text>
-      ) : (
-        sections.map((section) => (
-          <SectionBlock key={section.type} section={section} />
-        ))
-      )}
+      <ResearchSections
+        sections={sections}
+        emptyMessage="No Hi Energy matches for this company."
+      />
       <Divider />
       <Flex direction="row" gap="sm">
         <Button variant="secondary" onClick={handleResearch}>
@@ -117,25 +114,6 @@ function CompanyCard({ context }) {
         </Button>
         <Button href={{ url: APP_ORIGIN, external: true }}>Open Hi Energy AI</Button>
       </Flex>
-    </Flex>
-  );
-}
-
-function SectionBlock({ section }) {
-  const title =
-    section.type.charAt(0).toUpperCase() +
-    section.type.slice(1).replace(/_/g, ' ') +
-    (section.total ? ` · ${section.total}` : '');
-
-  return (
-    <Flex direction="column" gap="xs">
-      <Text format={{ fontWeight: 'bold' }}>{title}</Text>
-      {section.rows.map((row) => (
-        <Flex key={row.id || row.label} direction="column" gap="xs">
-          <Link href={row.adminUrl || APP_ORIGIN}>{row.label}</Link>
-          {row.subtitle ? <Text variant="microcopy">{row.subtitle}</Text> : null}
-        </Flex>
-      ))}
     </Flex>
   );
 }

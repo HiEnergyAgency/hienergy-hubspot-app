@@ -3,7 +3,7 @@
   "type": "workflow-action",
   "config": {
     "actionUrl": "https://app.hienergy.ai/hubspot/breeze/tools/search-advertisers",
-    "isPublished": true,
+    "isPublished": false,
     "supportedClients": [
       {
         "client": "AGENTS",

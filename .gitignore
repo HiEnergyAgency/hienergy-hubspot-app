@@ -7,3 +7,6 @@ marketplace/.browser-profile/
 .DS_Store
 *.log
 .hubspot/
+
+# HubSpot config file
+hubspot.config.yml

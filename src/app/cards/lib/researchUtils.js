@@ -1,5 +1,3 @@
-import { hubspot } from '@hubspot/ui-extensions';
-
 export const APP_ORIGIN = 'https://app.hienergy.ai';
 
 export function domainFromWebsite(website) {
@@ -11,6 +9,11 @@ export function domainFromWebsite(website) {
   } catch {
     return raw.replace(/^www\./, '').split('/')[0].toLowerCase();
   }
+}
+
+export function domainFromEmail(email) {
+  const m = String(email || '').match(/@([^@\s]+)/);
+  return m ? m[1].toLowerCase() : '';
 }
 
 export function getCompanySearchContext(properties = {}) {
@@ -25,7 +28,18 @@ export function getCompanySearchContext(properties = {}) {
   return { domain, query, label };
 }
 
-function normalizeCompanyResearchBody(body) {
+export function getContactSearchQuery(properties = {}) {
+  const email = properties.email || '';
+  const domain = domainFromEmail(email);
+  const query =
+    domain ||
+    properties.company ||
+    [properties.firstname, properties.lastname].filter(Boolean).join(' ');
+
+  return { domain, query, email };
+}
+
+export function normalizeCompanyResearchBody(body) {
   if (!body?.ok) {
     return {
       ok: false,
@@ -54,26 +68,6 @@ function normalizeCompanyResearchBody(body) {
   };
 }
 
-export async function researchCompany(properties = {}) {
-  const { domain, query } = getCompanySearchContext(properties);
-
-  if (!query) {
-    return {
-      ok: false,
-      message: 'Add a company domain or name to research in Hi Energy AI.'
-    };
-  }
-
-  const fn = domain ? 'hienergyAdvertiserByDomain' : 'hienergySearch';
-  const params = domain
-    ? { domain }
-    : { query, types: 'advertisers,deals,contacts', perTypeLimit: 5 };
-
-  const response = await hubspot.serverless(fn, { parameters: params });
-  const body = response?.body || response;
-  return normalizeCompanyResearchBody(body);
-}
-
 export function researchSummary(data) {
   const sections = data?.sections || [];
   if (!sections.length) return 'No Hi Energy matches found.';
@@ -84,4 +78,11 @@ export function researchSummary(data) {
       return `${count} ${section.type.replace(/_/g, ' ')}`;
     })
     .join(', ');
+}
+
+export function formatSectionTitle(section) {
+  const base =
+    section.type.charAt(0).toUpperCase() +
+    section.type.slice(1).replace(/_/g, ' ');
+  return section.total ? `${base} · ${section.total}` : base;
 }

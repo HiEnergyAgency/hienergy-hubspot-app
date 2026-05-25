@@ -1,5 +1,5 @@
 const { createServer } = require('http');
-const { dispatchBreezeAgentTool } = require('./handlers');
+const { dispatchHubSpotRequest } = require('./handlers');
 
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -34,7 +34,7 @@ async function handleRequest(req, res) {
 
   try {
     await readJsonBody(req);
-    const { statusCode, body } = await dispatchBreezeAgentTool(req);
+    const { statusCode, body } = await dispatchHubSpotRequest(req);
     res.writeHead(statusCode, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(body));
   } catch (err) {

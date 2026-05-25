@@ -1,12 +1,12 @@
-const { advertiserByDomain } = require('./lib/hienergy-client');
+const { validateApiKey } = require('./lib/hienergy-client');
 const { resolveHiEnergySecrets } = require('./lib/resolve-secrets');
 
 exports.main = async (context = {}) => {
-  const { domain } = context.parameters || {};
+  const { apiKey } = context.parameters || {};
+  const secrets = await resolveHiEnergySecrets(context);
 
   try {
-    const secrets = await resolveHiEnergySecrets(context);
-    const result = await advertiserByDomain(domain, secrets);
+    const result = await validateApiKey(apiKey, secrets);
     return { statusCode: result.ok ? 200 : 400, body: result };
   } catch (err) {
     return {

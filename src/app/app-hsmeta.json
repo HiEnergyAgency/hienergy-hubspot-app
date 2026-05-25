@@ -3,22 +3,21 @@
   "type": "app",
   "config": {
     "name": "Hi Energy AI",
-    "description": "Search Hi Energy AI advertisers, deals, transactions, and contacts from HubSpot company and contact records. Includes Breeze Studio agent tools backed by the Hi Energy MCP server.",
-    "scopes": [
-      "oauth",
-      "crm.objects.companies.read",
-      "crm.objects.contacts.read"
-    ],
+    "description": "Search Hi Energy AI advertisers, deals, and contacts from HubSpot company and contact records.",
+    "distribution": "marketplace",
     "auth": {
       "type": "oauth",
       "redirectUrls": [
-        "http://localhost:3000/oauth/callback"
+        "http://localhost:3000/oauth/callback",
+        "https://app.hienergy.ai/hubspot/oauth/callback"
       ],
       "requiredScopes": [
+        "oauth",
         "crm.objects.companies.read",
         "crm.objects.contacts.read"
       ],
-      "optionalScopes": []
+      "optionalScopes": [],
+      "conditionallyRequiredScopes": []
     },
     "permittedUrls": {
       "fetch": [
@@ -31,6 +30,11 @@
         "https://lh3.googleusercontent.com"
       ],
       "iframe": []
+    },
+    "support": {
+      "supportEmail": "support@hienergy.ai",
+      "documentationUrl": "https://app.hienergy.ai/api_documentation/mcp",
+      "supportUrl": "https://app.hienergy.ai"
     }
   }
 }

@@ -5,7 +5,7 @@
     "name": "Research company",
     "description": "Research this company in Hi Energy AI from the record sidebar",
     "location": "crm.record.sidebar",
-    "entrypoint": "/extensions/CompanyResearchSidebar.jsx",
+    "entrypoint": "/app/cards/CompanyResearchSidebar.jsx",
     "objectTypes": ["companies"]
   }
 }

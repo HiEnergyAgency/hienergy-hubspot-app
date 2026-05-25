@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import {
   hubspot,
   Text,
-  Link,
   Flex,
   LoadingSpinner,
   Alert,
-  Button
+  Button,
+  Link
 } from '@hubspot/ui-extensions';
 import {
   APP_ORIGIN,
@@ -43,7 +43,7 @@ function CompanyResearchSidebar({ context, addAlert }) {
     setState({ loading: true, researched: false, data: null, error: null });
 
     try {
-      const result = await researchCompany(props);
+      const result = await researchCompany(props, context?.portal?.id);
 
       if (!result.ok) {
         setState({
@@ -77,8 +77,9 @@ function CompanyResearchSidebar({ context, addAlert }) {
     }
   }
 
-  const sections = state.data?.sections || [];
-  const topRows = sections.flatMap((section) => section.rows || []).slice(0, 3);
+  const topRows = (state.data?.sections || [])
+    .flatMap((section) => section.rows || [])
+    .slice(0, 3);
 
   return (
     <Flex direction="column" gap="sm">

@@ -1,6 +1,14 @@
 import js from '@eslint/js';
 
 export default [
+  {
+    ignores: [
+      'node_modules/**',
+      'src/app/cards/**',
+      'src/app/settings/**',
+      'eslint.config.js'
+    ]
+  },
   js.configs.recommended,
   {
     languageOptions: {
@@ -15,7 +23,6 @@ export default [
         console: 'readonly',
         URL: 'readonly'
       }
-    },
-    ignores: ['node_modules/**', 'src/app/extensions/**']
+    }
   }
 ];

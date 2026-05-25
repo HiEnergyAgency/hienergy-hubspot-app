@@ -1,10 +1,11 @@
 const { universalSearch } = require('./lib/hienergy-client');
+const { resolveHiEnergySecrets } = require('./lib/resolve-secrets');
 
 exports.main = async (context = {}) => {
   const { query, types, perTypeLimit } = context.parameters || {};
-  const secrets = context.secrets || {};
 
   try {
+    const secrets = await resolveHiEnergySecrets(context);
     const result = await universalSearch(query, secrets, {
       types: types || 'advertisers,deals,contacts',
       perTypeLimit: perTypeLimit ? Number(perTypeLimit) : 5
