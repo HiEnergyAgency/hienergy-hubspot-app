@@ -3,7 +3,7 @@
   "type": "app",
   "config": {
     "name": "Hi Energy AI",
-    "description": "Search Hi Energy AI advertisers, deals, transactions, and contacts from HubSpot company and contact records.",
+    "description": "Search Hi Energy AI advertisers, deals, transactions, and contacts from HubSpot company and contact records. Includes Breeze Studio agent tools backed by the Hi Energy MCP server.",
     "scopes": [
       "oauth",
       "crm.objects.companies.read",

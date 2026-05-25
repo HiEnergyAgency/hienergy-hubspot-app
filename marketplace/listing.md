@@ -24,6 +24,8 @@ Hi Energy AI brings affiliate marketing intelligence into HubSpot CRM.
 
 **One connection** — Install the app, add your Hi Energy API key as an app secret, and every user in the portal sees live data without leaving HubSpot.
 
+**Breeze agents** — Add Hi Energy AI tools to Breeze Studio agents for natural-language search, domain lookup, advertiser discovery, and report recommendations via the Hi Energy MCP server.
+
 **Open in Hi Energy** — Every result links to the advertiser or deal in Hi Energy AI for deeper research.
 
 Built for partnership managers and affiliate teams who use HubSpot for pipeline tracking and Hi Energy AI for program data.

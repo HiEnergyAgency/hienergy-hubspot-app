@@ -3,7 +3,7 @@
   "type": "card",
   "config": {
     "name": "Hi Energy AI",
-    "description": "Advertisers and deals for this company domain",
+    "description": "Search Hi Energy AI advertisers, deals, and contacts. Includes a Research company button on company record pages.",
     "location": "crm.record.tab",
     "entrypoint": "/extensions/CompanyCard.jsx",
     "objectTypes": ["companies"]

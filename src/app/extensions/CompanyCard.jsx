@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   hubspot,
   Text,
@@ -9,82 +9,63 @@ import {
   Alert,
   Button
 } from '@hubspot/ui-extensions';
-
-const APP_ORIGIN = 'https://app.hienergy.ai';
+import {
+  APP_ORIGIN,
+  getCompanySearchContext,
+  researchCompany
+} from './lib/companyResearch';
 
 hubspot.extend(({ context }) => <CompanyCard context={context} />);
 
 function CompanyCard({ context }) {
   const props = context?.crm?.object?.properties || {};
-  const domain = domainFromWebsite(props.domain || props.website);
-  const query = domain || props.name || '';
+  const { query, label } = getCompanySearchContext(props);
+  const [state, setState] = useState({
+    loading: false,
+    researched: false,
+    data: null,
+    error: null
+  });
 
-  const [state, setState] = useState({ loading: true, data: null, error: null });
+  async function handleResearch() {
+    if (!query) {
+      setState({
+        loading: false,
+        researched: false,
+        data: null,
+        error: 'Add a company domain or name to search Hi Energy AI.'
+      });
+      return;
+    }
 
-  useEffect(() => {
-    let cancelled = false;
+    setState({ loading: true, researched: false, data: null, error: null });
 
-    async function load() {
-      if (!query) {
+    try {
+      const result = await researchCompany(props);
+
+      if (!result.ok) {
         setState({
           loading: false,
+          researched: false,
           data: null,
-          error: 'Add a company domain or name to search Hi Energy AI.'
+          error: result.message
         });
         return;
       }
 
-      setState({ loading: true, data: null, error: null });
-
-      try {
-        const fn = domain ? 'hienergyAdvertiserByDomain' : 'hienergySearch';
-        const params = domain ? { domain } : { query, types: 'advertisers,deals,contacts' };
-        const response = await hubspot.serverless(fn, { parameters: params });
-        const body = response?.body || response;
-
-        if (cancelled) return;
-        if (!body?.ok) {
-          setState({
-            loading: false,
-            data: null,
-            error: body?.message || 'Hi Energy request failed.'
-          });
-          return;
-        }
-
-        if (body.advertisers) {
-          setState({
-            loading: false,
-            data: {
-              sections: [
-                {
-                  type: 'advertisers',
-                  total: body.advertisers.length,
-                  rows: body.advertisers
-                }
-              ]
-            },
-            error: null
-          });
-          return;
-        }
-
-        setState({ loading: false, data: body, error: null });
-      } catch (err) {
-        if (!cancelled) {
-          setState({ loading: false, data: null, error: String(err.message || err) });
-        }
-      }
+      setState({ loading: false, researched: true, data: result, error: null });
+    } catch (err) {
+      setState({
+        loading: false,
+        researched: false,
+        data: null,
+        error: String(err.message || err)
+      });
     }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [query, domain]);
+  }
 
   if (state.loading) {
-    return <LoadingSpinner label="Searching Hi Energy AI…" />;
+    return <LoadingSpinner label="Researching in Hi Energy AI…" />;
   }
 
   if (state.error) {
@@ -93,7 +74,26 @@ function CompanyCard({ context }) {
         <Alert title="Hi Energy AI" variant="warning">
           {state.error}
         </Alert>
-        <Button href={`${APP_ORIGIN}/settings`}>Connect Hi Energy AI</Button>
+        <Button variant="primary" onClick={handleResearch} disabled={!query}>
+          Research company
+        </Button>
+        <Button href={{ url: `${APP_ORIGIN}/settings`, external: true }}>
+          Connect Hi Energy AI
+        </Button>
+      </Flex>
+    );
+  }
+
+  if (!state.researched) {
+    return (
+      <Flex direction="column" gap="md">
+        <Text variant="microcopy">{label}</Text>
+        <Text>
+          Search Hi Energy AI for advertisers, deals, and contacts linked to this company.
+        </Text>
+        <Button variant="primary" onClick={handleResearch} disabled={!query}>
+          Research company
+        </Button>
       </Flex>
     );
   }
@@ -102,9 +102,7 @@ function CompanyCard({ context }) {
 
   return (
     <Flex direction="column" gap="sm">
-      <Text variant="microcopy">
-        {domain ? `Domain: ${domain}` : `Search: ${query}`}
-      </Text>
+      <Text variant="microcopy">{label}</Text>
       {sections.length === 0 ? (
         <Text>No Hi Energy matches for this company.</Text>
       ) : (
@@ -113,7 +111,12 @@ function CompanyCard({ context }) {
         ))
       )}
       <Divider />
-      <Button href={APP_ORIGIN}>Open Hi Energy AI</Button>
+      <Flex direction="row" gap="sm">
+        <Button variant="secondary" onClick={handleResearch}>
+          Research again
+        </Button>
+        <Button href={{ url: APP_ORIGIN, external: true }}>Open Hi Energy AI</Button>
+      </Flex>
     </Flex>
   );
 }
@@ -135,15 +138,4 @@ function SectionBlock({ section }) {
       ))}
     </Flex>
   );
-}
-
-function domainFromWebsite(website) {
-  let raw = String(website || '').trim();
-  if (!raw) return '';
-  try {
-    if (!/^https?:\/\//i.test(raw)) raw = 'https://' + raw;
-    return new URL(raw).hostname.replace(/^www\./, '').toLowerCase();
-  } catch {
-    return raw.replace(/^www\./, '').split('/')[0].toLowerCase();
-  }
 }

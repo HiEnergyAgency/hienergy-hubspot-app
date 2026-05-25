@@ -1,0 +1,11 @@
+{
+  "uid": "hienergy_company_research_sidebar",
+  "type": "card",
+  "config": {
+    "name": "Research company",
+    "description": "Research this company in Hi Energy AI from the record sidebar",
+    "location": "crm.record.sidebar",
+    "entrypoint": "/extensions/CompanyResearchSidebar.jsx",
+    "objectTypes": ["companies"]
+  }
+}

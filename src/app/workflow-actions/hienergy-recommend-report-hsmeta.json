@@ -1,0 +1,74 @@
+{
+  "uid": "hienergy_breeze_recommend_report",
+  "type": "workflow-action",
+  "config": {
+    "actionUrl": "https://app.hienergy.ai/hubspot/breeze/tools/recommend-report",
+    "isPublished": true,
+    "supportedClients": [
+      {
+        "client": "AGENTS",
+        "toolType": "GET_DATA",
+        "llmConfig": {
+          "actionDescription": "Use when the user asks for a Hi Energy report in natural language, such as top advertisers, deal summaries, or status counts. Provide the user's goal as plain English. Optional period values include last_7_days, last_30_days, or last_90_days. If the goal is missing, do not call this tool."
+        }
+      }
+    ],
+    "inputFields": [
+      {
+        "typeDefinition": {
+          "name": "goal",
+          "type": "string",
+          "fieldType": "textarea"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      },
+      {
+        "typeDefinition": {
+          "name": "period",
+          "type": "string",
+          "fieldType": "text"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      }
+    ],
+    "outputFields": [
+      {
+        "typeDefinition": {
+          "name": "result",
+          "type": "string",
+          "externalOptions": false
+        }
+      },
+      {
+        "typeDefinition": {
+          "name": "errorCode",
+          "type": "string",
+          "externalOptions": false
+        }
+      }
+    ],
+    "labels": {
+      "en": {
+        "appDisplayName": "Hi Energy AI",
+        "actionName": "Recommend Hi Energy report",
+        "actionDescription": "Pick the best Hi Energy AI report for a natural-language analytics question.",
+        "actionCardContent": "Recommend report for {{goal}}",
+        "inputFieldLabels": {
+          "goal": "Report question",
+          "period": "Time period"
+        },
+        "inputFieldDescriptions": {
+          "goal": "Describe the report the user wants in plain language.",
+          "period": "Optional period such as last_30_days or last_90_days."
+        },
+        "outputFieldLabels": {
+          "result": "Report recommendation JSON",
+          "errorCode": "Error code"
+        }
+      }
+    },
+    "objectTypes": ["CONTACT", "COMPANY"]
+  }
+}

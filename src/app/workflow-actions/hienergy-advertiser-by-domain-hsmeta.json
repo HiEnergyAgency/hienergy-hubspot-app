@@ -1,0 +1,63 @@
+{
+  "uid": "hienergy_breeze_advertiser_by_domain",
+  "type": "workflow-action",
+  "config": {
+    "actionUrl": "https://app.hienergy.ai/hubspot/breeze/tools/advertiser-by-domain",
+    "isPublished": true,
+    "supportedClients": [
+      {
+        "client": "AGENTS",
+        "toolType": "GET_DATA",
+        "llmConfig": {
+          "actionDescription": "Use when the user provides a website domain or company website and wants matching Hi Energy advertisers. Pass a bare domain such as nike.com (no protocol or path). If the domain is missing, do not call this tool."
+        }
+      }
+    ],
+    "inputFields": [
+      {
+        "typeDefinition": {
+          "name": "domain",
+          "type": "string",
+          "fieldType": "text"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      }
+    ],
+    "outputFields": [
+      {
+        "typeDefinition": {
+          "name": "result",
+          "type": "string",
+          "externalOptions": false
+        }
+      },
+      {
+        "typeDefinition": {
+          "name": "errorCode",
+          "type": "string",
+          "externalOptions": false
+        }
+      }
+    ],
+    "labels": {
+      "en": {
+        "appDisplayName": "Hi Energy AI",
+        "actionName": "Find Hi Energy advertisers by domain",
+        "actionDescription": "Look up Hi Energy AI advertisers that match a company website domain.",
+        "actionCardContent": "Find advertisers for {{domain}}",
+        "inputFieldLabels": {
+          "domain": "Website domain"
+        },
+        "inputFieldDescriptions": {
+          "domain": "Bare domain only, for example nike.com."
+        },
+        "outputFieldLabels": {
+          "result": "Advertiser matches JSON",
+          "errorCode": "Error code"
+        }
+      }
+    },
+    "objectTypes": ["CONTACT", "COMPANY"]
+  }
+}

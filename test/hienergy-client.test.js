@@ -28,6 +28,7 @@ describe('hienergy-client helpers', () => {
                 id: 'a1',
                 attributes: {
                   display_name: 'Nike',
+                  slug: 'nike',
                   domain: 'nike.com',
                   program_status: 'active'
                 }

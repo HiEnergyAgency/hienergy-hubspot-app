@@ -139,7 +139,7 @@ function adminUrl(type, row) {
   return origin;
 }
 
-async function mcpCall(toolName, toolArgs, secrets) {
+async function callMcpTool(toolName, toolArgs, secrets) {
   const mcpUrl = (secrets.HIENERGY_MCP_URL || DEFAULT_MCP_URL).replace(/\/$/, '');
   const apiKey = secrets.HIENERGY_API_KEY;
   if (!apiKey) {
@@ -225,7 +225,7 @@ async function universalSearch(query, secrets, options) {
     return { ok: false, error: 'MISSING_QUERY', message: 'No search query.' };
   }
 
-  const result = await mcpCall(
+  const result = await callMcpTool(
     'universal_search',
     cleanArgs({
       q,
@@ -247,7 +247,7 @@ async function advertiserByDomain(domain, secrets) {
     return { ok: false, error: 'MISSING_DOMAIN', message: 'No domain on record.' };
   }
 
-  const result = await mcpCall('search_advertisers_by_domain', { domain: d }, secrets);
+  const result = await callMcpTool('search_advertisers_by_domain', { domain: d }, secrets);
   if (!result.ok) return result;
 
   const rows = result.body?.data || (Array.isArray(result.body) ? result.body : []);
@@ -277,12 +277,52 @@ function domainFromWebsite(website) {
   }
 }
 
+async function searchAdvertisers(query, secrets, options) {
+  const q = String(query || '').trim();
+  if (!q) {
+    return { ok: false, error: 'MISSING_QUERY', message: 'No advertiser search query.' };
+  }
+
+  return callMcpTool(
+    'search_advertisers',
+    cleanArgs({
+      name: q,
+      vertical: options?.vertical,
+      network: options?.network,
+      country: options?.country,
+      limit: options?.limit ?? 10
+    }),
+    secrets
+  );
+}
+
+async function recommendReport(goal, secrets, options) {
+  const g = String(goal || '').trim();
+  if (!g) {
+    return { ok: false, error: 'MISSING_GOAL', message: 'No report goal provided.' };
+  }
+
+  return callMcpTool(
+    'recommend_report',
+    cleanArgs({
+      goal: g,
+      period: options?.period
+    }),
+    secrets
+  );
+}
+
 module.exports = {
+  callMcpTool,
   universalSearch,
   advertiserByDomain,
+  searchAdvertisers,
+  recommendReport,
   domainFromEmail,
   domainFromWebsite,
   summarizeForCard,
   rowLabel,
-  rowSubtitle
+  rowSubtitle,
+  parseMcpBody,
+  normalizeSearchBody
 };

@@ -6,6 +6,8 @@
   "scripts": {
     "lint": "eslint .",
     "test": "node --test test/*.test.js",
+    "test:breeze": "node --test test/hubspot-agent-tool.test.js",
+    "breeze:server": "node breeze/server.js",
     "validate": "npm run lint && npm run test",
     "upload": "hs project upload",
     "dev": "hs project dev",

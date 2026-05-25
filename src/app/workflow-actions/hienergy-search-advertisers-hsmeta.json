@@ -1,0 +1,107 @@
+{
+  "uid": "hienergy_breeze_search_advertisers",
+  "type": "workflow-action",
+  "config": {
+    "actionUrl": "https://app.hienergy.ai/hubspot/breeze/tools/search-advertisers",
+    "isPublished": true,
+    "supportedClients": [
+      {
+        "client": "AGENTS",
+        "toolType": "GET_DATA",
+        "llmConfig": {
+          "actionDescription": "Use when the user wants to discover Hi Energy advertisers by name or filters such as vertical, network, or country. Provide a query string for the advertiser name or keyword. Optional filters refine results. If no query is provided, do not call this tool."
+        }
+      }
+    ],
+    "inputFields": [
+      {
+        "typeDefinition": {
+          "name": "query",
+          "type": "string",
+          "fieldType": "text"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      },
+      {
+        "typeDefinition": {
+          "name": "vertical",
+          "type": "string",
+          "fieldType": "text"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      },
+      {
+        "typeDefinition": {
+          "name": "network",
+          "type": "string",
+          "fieldType": "text"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      },
+      {
+        "typeDefinition": {
+          "name": "country",
+          "type": "string",
+          "fieldType": "text"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      },
+      {
+        "typeDefinition": {
+          "name": "limit",
+          "type": "number",
+          "fieldType": "number"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      }
+    ],
+    "outputFields": [
+      {
+        "typeDefinition": {
+          "name": "result",
+          "type": "string",
+          "externalOptions": false
+        }
+      },
+      {
+        "typeDefinition": {
+          "name": "errorCode",
+          "type": "string",
+          "externalOptions": false
+        }
+      }
+    ],
+    "labels": {
+      "en": {
+        "appDisplayName": "Hi Energy AI",
+        "actionName": "Search Hi Energy advertisers",
+        "actionDescription": "Search Hi Energy AI advertisers by name with optional vertical, network, and country filters.",
+        "actionCardContent": "Search advertisers for {{query}}",
+        "inputFieldLabels": {
+          "query": "Advertiser name or keyword",
+          "vertical": "Vertical filter",
+          "network": "Network filter",
+          "country": "Country filter",
+          "limit": "Result limit"
+        },
+        "inputFieldDescriptions": {
+          "query": "Advertiser name or keyword to search.",
+          "vertical": "Optional vertical such as fashion or travel.",
+          "network": "Optional affiliate network name.",
+          "country": "Optional country code or name.",
+          "limit": "Optional maximum number of advertisers to return."
+        },
+        "outputFieldLabels": {
+          "result": "Advertiser search JSON",
+          "errorCode": "Error code"
+        }
+      }
+    },
+    "objectTypes": ["CONTACT", "COMPANY"]
+  }
+}

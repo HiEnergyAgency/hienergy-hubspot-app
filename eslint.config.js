@@ -10,7 +10,10 @@ export default [
         process: 'readonly',
         module: 'readonly',
         exports: 'writable',
-        fetch: 'readonly'
+        fetch: 'readonly',
+        Buffer: 'readonly',
+        console: 'readonly',
+        URL: 'readonly'
       }
     },
     ignores: ['node_modules/**', 'src/app/extensions/**']

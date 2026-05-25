@@ -1,0 +1,85 @@
+{
+  "uid": "hienergy_breeze_universal_search",
+  "type": "workflow-action",
+  "config": {
+    "actionUrl": "https://app.hienergy.ai/hubspot/breeze/tools/universal-search",
+    "isPublished": true,
+    "supportedClients": [
+      {
+        "client": "AGENTS",
+        "toolType": "GET_DATA",
+        "llmConfig": {
+          "actionDescription": "Use when the user asks to search Hi Energy AI for advertisers, deals, or contacts. Provide a free-text query such as a brand name, company name, email domain, or person name. Optional types can narrow results to advertisers, deals, contacts, or transactions (comma-separated). If no query is provided, do not call this tool."
+        }
+      }
+    ],
+    "inputFields": [
+      {
+        "typeDefinition": {
+          "name": "query",
+          "type": "string",
+          "fieldType": "text"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      },
+      {
+        "typeDefinition": {
+          "name": "types",
+          "type": "string",
+          "fieldType": "text"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      },
+      {
+        "typeDefinition": {
+          "name": "per_type_limit",
+          "type": "number",
+          "fieldType": "number"
+        },
+        "supportedValueTypes": ["STATIC_VALUE"],
+        "isRequired": false
+      }
+    ],
+    "outputFields": [
+      {
+        "typeDefinition": {
+          "name": "result",
+          "type": "string",
+          "externalOptions": false
+        }
+      },
+      {
+        "typeDefinition": {
+          "name": "errorCode",
+          "type": "string",
+          "externalOptions": false
+        }
+      }
+    ],
+    "labels": {
+      "en": {
+        "appDisplayName": "Hi Energy AI",
+        "actionName": "Search Hi Energy (universal)",
+        "actionDescription": "Search Hi Energy AI advertisers, deals, and contacts from a free-text query.",
+        "actionCardContent": "Search Hi Energy for {{query}}",
+        "inputFieldLabels": {
+          "query": "Search query",
+          "types": "Result types (comma-separated)",
+          "per_type_limit": "Max results per type"
+        },
+        "inputFieldDescriptions": {
+          "query": "Brand, company, domain, or person to search in Hi Energy AI.",
+          "types": "Optional filter such as advertisers,deals,contacts.",
+          "per_type_limit": "Optional limit per result type (default 5)."
+        },
+        "outputFieldLabels": {
+          "result": "Search results JSON",
+          "errorCode": "Error code"
+        }
+      }
+    },
+    "objectTypes": ["CONTACT", "COMPANY"]
+  }
+}
