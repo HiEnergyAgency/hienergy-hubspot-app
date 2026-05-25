@@ -6,6 +6,10 @@ services:
     buildCommand: npm ci
     startCommand: node breeze/server.js
     healthCheckPath: /health
+    disk:
+      name: hubspot-portal-data
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: NODE_VERSION
         value: "20"

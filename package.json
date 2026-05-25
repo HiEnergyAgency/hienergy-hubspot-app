@@ -8,6 +8,8 @@
     "test": "node --test test/*.test.js",
     "test:breeze": "node --test test/breeze-*.test.js test/portal-credentials.test.js",
     "breeze:server": "node breeze/server.js",
+    "deploy:breeze": "bash scripts/deploy-breeze.sh",
+    "deploy:breeze:verify": "bash scripts/deploy-breeze.sh verify",
     "validate": "npm run lint && npm run test",
     "upload": "hs project upload",
     "dev": "hs project dev"

@@ -4,6 +4,7 @@ dist/
 .env.*
 !.env.example
 marketplace/.browser-profile/
+scripts/deploy-breeze.env
 .DS_Store
 *.log
 .hubspot/

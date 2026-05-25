@@ -89,8 +89,15 @@ For development, you can also configure portal credentials on the Hi Energy back
 Deploy the webhook service with `render.yaml` or run locally:
 
 ```bash
-HUBSPOT_CLIENT_SECRET=... HIENERGY_HUBSPOT_PORTAL_STORE=/tmp/portals.json npm run breeze:server
+cp scripts/deploy-breeze.env.example scripts/deploy-breeze.env
+# fill HUBSPOT_CLIENT_ID, HUBSPOT_CLIENT_SECRET, portal storage vars
+
+npm run deploy:breeze render    # sync Blueprint to Render
+npm run deploy:breeze verify    # check https://app.hienergy.ai/health
+npm run deploy:breeze local     # run on :8787 for dev
 ```
+
+See [`scripts/deploy-breeze.sh`](scripts/deploy-breeze.sh) for Docker build/run and full options.
 
 ### Add CRM cards
 
