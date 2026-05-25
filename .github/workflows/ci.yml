@@ -51,12 +51,14 @@ jobs:
   hubspot-validate:
     name: HubSpot project validate
     runs-on: ubuntu-latest
+    env:
+      DEFAULT_CLI_VERSION: '8.7.0'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Validate project structure
-        run: npx --yes @hubspot/cli@8.7.0 project validate
+        uses: HubSpot/hubspot-project-actions/project-validate@v1.1.0
 
   deploy:
     name: Deploy to HubSpot
