@@ -3,15 +3,15 @@ name: CI
 on:
   pull_request:
   push:
-    branches-ignore:
-      - main
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  validate:
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,8 +26,53 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint and test
-        run: npm run validate
+      - name: Run ESLint
+        run: npm run lint
 
-      - name: Validate HubSpot project structure
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+  hubspot-validate:
+    name: HubSpot project validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate project structure
         run: npx --yes @hubspot/cli@7.11.0 project validate
+
+  deploy:
+    name: Deploy to HubSpot
+    needs:
+      - lint
+      - test
+      - hubspot-validate
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      DEFAULT_ACCOUNT_ID: ${{ secrets.HUBSPOT_ACCOUNT_ID }}
+      DEFAULT_PERSONAL_ACCESS_KEY: ${{ secrets.HUBSPOT_PERSONAL_ACCESS_KEY }}
+      DEFAULT_CLI_VERSION: '7.11.0'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload and deploy HubSpot project
+        uses: HubSpot/hubspot-project-actions/project-upload@v1.1.0

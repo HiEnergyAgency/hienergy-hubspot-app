@@ -127,7 +127,7 @@ Add these repository secrets ([HubSpot GitHub Actions guide](https://developers.
 | `HUBSPOT_ACCOUNT_ID` | `48470442` |
 | `HUBSPOT_PERSONAL_ACCESS_KEY` | Your HubSpot developer PAK |
 
-Pull requests run lint, tests, and `hs project validate`. Pushes to `main` run tests, then `hs project upload` (auto-deploy is enabled on the HubSpot project).
+Pull requests and every push run **Lint**, **Test**, and **HubSpot project validate** jobs. Pushes to `main` also deploy to HubSpot after those checks pass.
 
 ## OAuth scopes
 
