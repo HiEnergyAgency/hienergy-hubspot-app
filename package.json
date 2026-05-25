@@ -1,0 +1,21 @@
+{
+  "name": "hienergy-hubspot-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hi Energy AI integration for HubSpot CRM — Marketplace app",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "node --test test/*.test.js",
+    "validate": "npm run lint && npm run test",
+    "upload": "hs project upload",
+    "dev": "hs project dev",
+    "deploy": "hs project upload"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

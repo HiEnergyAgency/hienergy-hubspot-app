@@ -1,0 +1,36 @@
+{
+  "uid": "hienergy_app",
+  "type": "app",
+  "config": {
+    "name": "Hi Energy AI",
+    "description": "Search Hi Energy AI advertisers, deals, transactions, and contacts from HubSpot company and contact records.",
+    "scopes": [
+      "oauth",
+      "crm.objects.companies.read",
+      "crm.objects.contacts.read"
+    ],
+    "auth": {
+      "type": "oauth",
+      "redirectUrls": [
+        "http://localhost:3000/oauth/callback"
+      ],
+      "requiredScopes": [
+        "crm.objects.companies.read",
+        "crm.objects.contacts.read"
+      ],
+      "optionalScopes": []
+    },
+    "permittedUrls": {
+      "fetch": [
+        "https://api.hubapi.com",
+        "https://app.hienergy.ai",
+        "https://api.hienergyrocket.com"
+      ],
+      "img": [
+        "https://app.hienergy.ai",
+        "https://lh3.googleusercontent.com"
+      ],
+      "iframe": []
+    }
+  }
+}

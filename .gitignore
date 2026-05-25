@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+marketplace/.browser-profile/
+.DS_Store
+*.log
+.hubspot/

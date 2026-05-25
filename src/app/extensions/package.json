@@ -1,0 +1,9 @@
+{
+  "name": "hienergy-hubspot-extensions",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@hubspot/ui-extensions": "^0.10.0",
+    "react": "^18.3.1"
+  }
+}

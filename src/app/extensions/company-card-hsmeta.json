@@ -1,0 +1,11 @@
+{
+  "uid": "hienergy_company_card",
+  "type": "card",
+  "config": {
+    "name": "Hi Energy AI",
+    "description": "Advertisers and deals for this company domain",
+    "location": "crm.record.tab",
+    "entrypoint": "/extensions/CompanyCard.jsx",
+    "objectTypes": ["companies"]
+  }
+}

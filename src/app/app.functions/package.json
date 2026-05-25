@@ -1,0 +1,8 @@
+{
+  "name": "hienergy-hubspot-functions",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@hubspot/api-client": "^12.0.0"
+  }
+}
